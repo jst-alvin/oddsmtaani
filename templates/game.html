@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Play Game - OddsMtaani</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      :root {
+        --bg-start: #050a1f;
+        --bg-end: #0d1530;
+        --accent: #0A1AFF;
+        --accent-glow: rgba(10, 26, 255, 0.4);
+      }
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        position: relative;
+      }
+      .container { position: relative; z-index: 1; }
+      .game-card {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(10, 26, 255, 0.3);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px rgba(10, 26, 255, 0.15);
+        border-radius: 15px;
+        padding: 3rem;
+      }
+      .brand {
+        font-weight: 800;
+        color: var(--accent);
+        text-shadow: 0 0 20px var(--accent-glow);
+      }
+      .success-icon {
+        font-size: 4rem;
+        color: #28a745;
+        margin-bottom: 1rem;
+      }
+      .game-content {
+        background: rgba(255,255,255,0.1);
+        padding: 2rem;
+        border-radius: 10px;
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container py-4">
+      <div class="game-card text-center">
+        <div class="success-icon">✅</div>
+        <h1 class="brand mb-3">Payment Confirmed!</h1>
+        <p class="lead">Payment ID: <code>{{ payment_id }}</code></p>
+        <p>Phone: <strong>{{ phone }}</strong></p>
+        
+        <div class="game-content">
+          <h3 class="mb-4">🎮 Game Area</h3>
+          <p class="text-muted">Your game logic goes here...</p>
+          <p class="text-muted">This is where users will play the betting game after payment is confirmed.</p>
+          
+          <div class="mt-4">
+            <button class="btn btn-primary btn-lg">Start Playing</button>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <a href="/" class="text-decoration-none" style="color: var(--accent);">← Back to Home</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

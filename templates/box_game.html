@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Box Selection Game - OddsMtaani</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      :root {
+        --bg-start: #050a1f;
+        --bg-end: #0d1530;
+        --accent: #0A1AFF;
+        --accent-glow: rgba(10, 26, 255, 0.4);
+      }
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        color: #ffffff;
+        position: relative;
+      }
+      #particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--accent-glow), transparent);
+        animation: float 8s infinite ease-in-out;
+        opacity: 0.6;
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0) translateX(0); }
+        25% { transform: translateY(-30px) translateX(20px); }
+        50% { transform: translateY(-50px) translateX(-20px); }
+        75% { transform: translateY(-20px) translateX(30px); }
+      }
+      .container { position: relative; z-index: 1; padding: 2rem 0; }
+      .game-card {
+        max-width: 900px;
+        margin: 0 auto;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(10, 26, 255, 0.3);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px rgba(10, 26, 255, 0.15);
+        border-radius: 18px;
+        padding: 2rem;
+      }
+      .brand {
+        font-weight: 800;
+        color: var(--accent);
+        text-shadow: 0 0 20px var(--accent-glow);
+      }
+      .boxes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+      }
+      .box {
+        aspect-ratio: 1;
+        border: 3px solid rgba(10, 26, 255, 0.5);
+        border-radius: 15px;
+        background: linear-gradient(135deg, rgba(10, 26, 255, 0.15), rgba(10, 26, 255, 0.05));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .box:hover:not(.disabled) {
+        border-color: var(--accent);
+        background: linear-gradient(135deg, rgba(10, 26, 255, 0.25), rgba(10, 26, 255, 0.1));
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px var(--accent-glow);
+      }
+      .box.selected {
+        border-color: var(--accent);
+        background: linear-gradient(135deg, rgba(10, 26, 255, 0.3), rgba(10, 26, 255, 0.15));
+        box-shadow: 0 0 30px var(--accent-glow);
+      }
+      .box.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .box-label {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--accent);
+      }
+      .box-hint {
+        font-size: 0.9rem;
+        color: #aaa;
+        text-transform: uppercase;
+      }
+      .result-box {
+        background: rgba(10, 26, 255, 0.2);
+        border: 2px solid var(--accent);
+        border-radius: 12px;
+        padding: 2.5rem;
+        text-align: center;
+        display: none;
+        margin-top: 2rem;
+      }
+      .result-box.show {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .result-box.win h3 {
+        font-size: 2.5rem;
+        color: #28a745;
+        margin-bottom: 1rem;
+      }
+      .result-box.loss h3 {
+        font-size: 2.5rem;
+        color: #ff6b6b;
+        margin-bottom: 1rem;
+      }
+      .result-box p {
+        font-size: 1.3rem;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+      }
+      .prize-amount {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #28a745;
+        margin: 1rem 0;
+      }
+      .btn-play {
+        background-color: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff;
+        font-size: 1.1rem;
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .btn-play:hover {
+        background-color: #0816d9;
+        box-shadow: 0 0 20px var(--accent-glow);
+        transform: translateY(-2px);
+        color: #ffffff;
+      }
+      .btn-play:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .game-info {
+        background: rgba(255,255,255,0.08);
+        border-left: 4px solid var(--accent);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+      }
+      .game-info p {
+        margin: 0.3rem 0;
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="particles"></div>
+    <div class="container">
+      <div class="game-card">
+        <h1 class="brand text-center mb-3">🎮 Mystery Box Game</h1>
+        
+        <div class="game-info">
+          <p><strong>Payment ID:</strong> {{ payment_id }}</p>
+          <p><strong>Entry Fee Paid:</strong> KES 50</p>
+          <p><strong>How to Play:</strong> Pick one of the 5 mystery boxes! Each box contains a hidden prize. One box has a special surprise...</p>
+        </div>
+
+        <div class="text-center">
+          <h5 class="mb-4">Select Your Mystery Box:</h5>
+          <div class="boxes-grid">
+            <div class="box" onclick="selectBox(1, this)">
+              <div class="box-label">?</div>
+              <div class="box-hint">Box 1</div>
+            </div>
+            <div class="box" onclick="selectBox(2, this)">
+              <div class="box-label">?</div>
+              <div class="box-hint">Box 2</div>
+            </div>
+            <div class="box" onclick="selectBox(3, this)">
+              <div class="box-label">?</div>
+              <div class="box-hint">Box 3</div>
+            </div>
+            <div class="box" onclick="selectBox(4, this)">
+              <div class="box-label">?</div>
+              <div class="box-hint">Box 4</div>
+            </div>
+            <div class="box" onclick="selectBox(5, this)">
+              <div class="box-label">?</div>
+              <div class="box-hint">Box 5</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <button class="btn btn-play" id="playBtn" onclick="playGame()" disabled>
+            🎯 Reveal Your Prize!
+          </button>
+        </div>
+
+        <div class="result-box" id="resultBox">
+          <h3 id="resultText">🎉 YOU WIN!</h3>
+          <p id="resultMessage"></p>
+          <div class="prize-amount" id="prizeAmount"></div>
+          <button class="btn btn-play mt-3" id="playAgainBtn" onclick="playAgain()">Play Again</button>
+        </div>
+
+        <div class="text-center mt-4">
+          <a href="/" class="text-decoration-none" style="color: var(--accent);">← Back to Home</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Base prizes array to shuffle
+      const prizes = [50, 100, 200, 300, 0];
+      
+      // Shuffle prizes randomly on page load
+      function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      }
+      
+      // Randomize prize assignment
+      const shuffledPrizes = shuffleArray(prizes);
+      const prizeMap = {};
+      for (let i = 0; i < shuffledPrizes.length; i++) {
+        prizeMap[i + 1] = shuffledPrizes[i];
+      }
+
+      let selectedBox = null;
+      let selectedElement = null;
+
+      // Create particles
+      const particlesContainer = document.getElementById('particles');
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        const size = Math.random() * 80 + 40;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+        particlesContainer.appendChild(particle);
+      }
+
+      function selectBox(boxNumber, element) {
+        // Remove previous selection
+        if (selectedElement) {
+          selectedElement.classList.remove('selected');
+        }
+        
+        // Set new selection
+        selectedBox = boxNumber;
+        selectedElement = element;
+        element.classList.add('selected');
+        
+        // Enable play button
+        document.getElementById('playBtn').disabled = false;
+      }
+
+      function playGame() {
+        if (selectedBox === null) return;
+
+        // Disable all boxes
+        document.querySelectorAll('.box').forEach(box => box.classList.add('disabled'));
+        document.getElementById('playBtn').disabled = true;
+
+        // Get prize for selected box
+        const prize = prizeMap[selectedBox];
+
+        // Simulate reveal animation
+        setTimeout(() => {
+          const resultBox = document.getElementById('resultBox');
+          const resultText = document.getElementById('resultText');
+          const resultMessage = document.getElementById('resultMessage');
+          const prizeAmount = document.getElementById('prizeAmount');
+          
+          if (prize === 0) {
+            // Loss case
+            resultBox.classList.remove('win');
+            resultBox.classList.add('loss');
+            resultText.textContent = '💫 Better Luck Next Time!';
+            resultMessage.textContent = 'You selected the special surprise box! No worries—every player wins eventually. Come back and try again!';
+            prizeAmount.textContent = '';
+          } else {
+            // Win case
+            resultBox.classList.remove('loss');
+            resultBox.classList.add('win');
+            resultText.textContent = '🎉 YOU WIN!';
+            resultMessage.textContent = 'Congratulations! Your mystery box contained:';
+            prizeAmount.textContent = `KES ${prize}`;
+          }
+          
+          resultBox.classList.add('show');
+          
+          // Log the game result
+          fetch('/game-result', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              payment_id: '{{ payment_id }}',
+              prize: prize,
+              box_number: selectedBox
+            })
+          });
+        }, 500);
+      }
+
+      function playAgain() {
+        // Redirect to payment page to pay again
+        window.location.href = '/';
+      }
+    </script>
+  </body>
+</html>

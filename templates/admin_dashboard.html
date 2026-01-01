@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard - OddsMtaani</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      :root {
+        --bg-start: #050a1f;
+        --bg-end: #0d1530;
+        --accent: #0A1AFF;
+      }
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        color: #ffffff;
+        padding: 2rem 0;
+      }
+      .stats-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(10, 26, 255, 0.3);
+        backdrop-filter: blur(12px);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .table {
+        background: rgba(255,255,255,0.05);
+        color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .table th {
+        background: rgba(10, 26, 255, 0.2);
+        border-color: rgba(10, 26, 255, 0.3);
+      }
+      .table td {
+        border-color: rgba(255,255,255,0.1);
+      }
+      .btn-success {
+        background: #28a745;
+        border: none;
+      }
+      .btn-danger {
+        background: #dc3545;
+        border: none;
+      }
+      .brand {
+        font-weight: 800;
+        color: var(--accent);
+        text-shadow: 0 0 20px rgba(10, 26, 255, 0.4);
+      }
+      .badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center mb-4"><span class="brand">OddsMtaani</span> Admin Dashboard</h1>
+      
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="stats-card text-center">
+            <h3>{{ pending|length }}</h3>
+            <p>Pending Payments</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stats-card text-center">
+            <h3>{{ confirmed|length }}</h3>
+            <p>Confirmed Payments</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stats-card text-center">
+            <h3>{{ payment_number }}</h3>
+            <p>Payment Number</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <h3 class="mb-3">⏳ Pending Payments</h3>
+        {% if pending %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Payment ID</th>
+                <th>Phone</th>
+                <th>Amount</th>
+                <th>Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for id, payment in pending.items() %}
+              <tr id="payment-{{ id }}">
+                <td><code>{{ id }}</code></td>
+                <td>{{ payment.phone }}</td>
+                <td>KES {{ payment.amount }}</td>
+                <td>{{ payment.timestamp }}</td>
+                <td>
+                  <button class="btn btn-success btn-sm" onclick="confirmPayment('{{ id }}')">
+                    ✓ Confirm
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="rejectPayment('{{ id }}')">
+                    ✗ Reject
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-center text-muted">No pending payments</p>
+        {% endif %}
+      </div>
+
+      <div>
+        <h3 class="mb-3">✅ Confirmed Payments</h3>
+        {% if confirmed %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Payment ID</th>
+                <th>Phone</th>
+                <th>Amount</th>
+                <th>Confirmed At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for id, payment in confirmed.items() %}
+              <tr>
+                <td><code>{{ id }}</code></td>
+                <td>{{ payment.phone }}</td>
+                <td>KES {{ payment.amount }}</td>
+                <td>{{ payment.confirmed_at }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-center text-muted">No confirmed payments yet</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function confirmPayment(paymentId) {
+        if (!confirm('Confirm payment ' + paymentId + '?')) return;
+        
+        fetch('/admin/confirm/' + paymentId, { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              alert('Payment confirmed!');
+              location.reload();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          })
+          .catch(err => alert('Error: ' + err));
+      }
+
+      function rejectPayment(paymentId) {
+        if (!confirm('Reject payment ' + paymentId + '?')) return;
+        
+        fetch('/admin/reject/' + paymentId, { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              alert('Payment rejected!');
+              location.reload();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          })
+          .catch(err => alert('Error: ' + err));
+      }
+
+      // Auto-refresh every 30 seconds
+      setTimeout(() => location.reload(), 30000);
+    </script>
+  </body>
+</html>

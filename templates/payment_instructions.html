@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Payment Instructions - OddsMtaani</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      :root {
+        --bg-start: #040814;
+        --bg-end: #0c1740;
+        --accent: #0A1AFF;
+        --accent-glow: rgba(10, 26, 255, 0.55);
+        --card: rgba(255,255,255,0.12);
+        --card-strong: rgba(10, 26, 255, 0.22);
+        --text-strong: #e8ecff;
+        --text-muted-strong: #cfd8ff;
+      }
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        position: relative;
+      }
+      .container { position: relative; z-index: 1; }
+      .instructions-card {
+        max-width: 680px;
+        margin: 0 auto;
+        background: var(--card);
+        border: 1px solid rgba(10, 26, 255, 0.45);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 12px 40px rgba(10, 26, 255, 0.25);
+        border-radius: 18px;
+      }
+      .brand {
+        font-weight: 800;
+        color: var(--accent);
+        text-shadow: 0 0 20px var(--accent-glow);
+      }
+      .payment-id-box {
+        background: var(--card-strong);
+        border: 2px solid var(--accent);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        text-align: center;
+        color: var(--text-strong);
+      }
+      .payment-id-box code {
+        font-size: 1.35rem;
+        color: #ffffff;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+      }
+      .step {
+        background: rgba(8, 14, 35, 0.85);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-left: 5px solid var(--accent);
+        padding: 1.1rem;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        color: var(--text-strong);
+      }
+      .step h5 {
+        color: #ffffff;
+        margin-bottom: 0.35rem;
+        font-weight: 700;
+      }
+      .payment-number {
+        display: inline-block;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0A1AFF;
+        background: #ffffff;
+        padding: 0.35rem 0.9rem;
+        border-radius: 10px;
+        text-decoration: none;
+        box-shadow: 0 6px 20px rgba(10, 26, 255, 0.35);
+      }
+      .btn-primary {
+        background-color: #1c2cff;
+        border-color: #1c2cff;
+        font-size: 1.1rem;
+        padding: 0.9rem 2.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 22px rgba(28, 44, 255, 0.35);
+      }
+      .btn-primary:hover {
+        background-color: #0f1fd4;
+        border-color: #0f1fd4;
+        box-shadow: 0 0 26px var(--accent-glow);
+        transform: translateY(-1px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container py-4">
+      <div class="card instructions-card shadow-lg">
+        <div class="card-body p-4 p-md-5">
+          <h1 class="brand mb-3 text-center">⚡ OddsMtaani</h1>
+          <p class="lead text-center mb-2">Payment Instructions</p>
+          
+          <div class="payment-id-box">
+            <p class="mb-2">Your Payment ID:</p>
+            <code>{{ payment_id }}</code>
+            <p class="text-muted mt-2 mb-0"><small>Save this for reference</small></p>
+          </div>
+
+          <div class="step">
+            <h5>1️⃣ Open M-Pesa on Your Phone</h5>
+            <p class="mb-0">Go to your M-Pesa menu and select "Send Money"</p>
+          </div>
+
+          <div class="step">
+            <h5>2️⃣ Send KES {{ amount }} to:</h5>
+            <p class="mb-0">
+              <a href="tel:{{ payment_number }}" class="payment-number">{{ payment_number }}</a>
+            </p>
+          </div>
+
+          <div class="step">
+            <h5>3️⃣ Complete the Transaction</h5>
+            <p class="mb-0">Enter your M-Pesa PIN and confirm the payment</p>
+          </div>
+
+          <div class="step">
+            <h5>4️⃣ Wait for Confirmation</h5>
+            <p class="mb-0">Your payment will be verified within 1-2 minutes. Click the button below to check status.</p>
+          </div>
+
+          <div class="text-center mt-4">
+            <a href="/check-status" class="btn btn-primary">
+              🔍 Check Payment Status
+            </a>
+          </div>
+
+          <div class="text-center mt-3">
+            <small class="text-muted">Phone: {{ phone }}</small>
+          </div>
+
+          <div class="text-center mt-3">
+            <a href="/" class="text-decoration-none" style="color: var(--accent);">← Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

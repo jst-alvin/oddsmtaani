@@ -1,0 +1,32 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class BoxGame {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Random rand = new Random();
+
+        int entryFee = 50;
+        int winningBox = rand.nextInt(5) + 1;
+        int prize = (rand.nextInt(5) + 1) * 100;
+
+        System.out.println("=== BOX GAME ===");
+        System.out.println("Boxes: 1 2 3 4 5");
+        System.out.println("Entry Fee: KES " + entryFee);
+        System.out.print("Choose a box (1-5): ");
+
+        int choice = sc.nextInt();
+
+        if (choice < 1 || choice > 5) {
+            System.out.println("Invalid choice");
+        } else if (choice == winningBox) {
+            System.out.println("You WIN!");
+            System.out.println("Prize: KES " + prize);
+        } else {
+            System.out.println("You LOSE!");
+            System.out.println("Winning box was: " + winningBox);
+        }
+
+        sc.close();
+    }
+}
