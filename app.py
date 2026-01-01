@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session
+from functools import wraps
 import config
-print("[DEBUG] Loaded config from", getattr(config, '__file__', None))
-print("[DEBUG] PAYMENT_NUMBER", getattr(config, 'PAYMENT_NUMBER', None))
-print("[DEBUG] ENTRY_FEE", getattr(config, 'ENTRY_FEE', None))
 import logging
 from datetime import datetime
 import secrets
@@ -10,7 +8,29 @@ import os
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000  # Cache static files for 1 year
+
+# Setup logging
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Caching decorator
+def cache_response(seconds=300):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            response = f(*args, **kwargs)
+            if isinstance(response, tuple):
+                response, status = response, 200
+            else:
+                status = 200
+            # Add cache headers
+            from flask import make_response
+            resp = make_response(response, status)
+            resp.headers['Cache-Control'] = f'public, max-age={seconds}'
+            return resp
+        return decorated_function
+    return decorator
 
 # In-memory storage (use database in production)
 pending_payments = {}  # {payment_id: {phone, amount, timestamp, status}}

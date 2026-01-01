@@ -254,9 +254,9 @@
       let selectedBox = null;
       let selectedElement = null;
 
-      // Create particles
+      // Create particles (reduced from 30 to 15 for faster rendering)
       const particlesContainer = document.getElementById('particles');
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 15; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
         const size = Math.random() * 80 + 40;
